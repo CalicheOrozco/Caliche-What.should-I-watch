@@ -204,5 +204,36 @@ export function useMovieFetcher() {
     }
   }, []);
 
-  return { status, movie, trailer, providers, error, fetchMovie };
+  const fetchById = useCallback(async (id, mediaType, lang = "en") => {
+    setStatus("loading");
+    setError(null);
+    const isTV = mediaType === "tv";
+    const getDetails = isTV ? getTVDetails : getMovieDetails;
+    const getVideos = isTV ? getTVVideos : getMovieVideos;
+    const getProviders = isTV ? getTVWatchProviders : getMovieWatchProviders;
+
+    try {
+      const [details, videos, watchProviders] = await Promise.all([
+        getDetails(id, lang),
+        getVideos(id),
+        getProviders(id),
+      ]);
+
+      const trailerVideo =
+        (videos.results || []).find(
+          (v) => v.type === "Trailer" && v.site === "YouTube"
+        ) || null;
+
+      setMovie(normalizeResult(details, isTV));
+      setTrailer(trailerVideo ? trailerVideo.key : null);
+      setProviders(watchProviders.results || {});
+      setStatus("success");
+    } catch (err) {
+      setError(err.message);
+      setStatus("error");
+      throw err;
+    }
+  }, []);
+
+  return { status, movie, trailer, providers, error, fetchMovie, fetchById };
 }

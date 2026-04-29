@@ -88,6 +88,9 @@ export const T = {
     popularityBlockbuster: "Blockbuster / Popular",
     popularityHidden: "Hidden gem / Indie",
     popularityAny: "Doesn't matter",
+    searchLabel: "Search",
+    searchPlaceholder: "Search movies & shows...",
+    searchNoResults: "No results found.",
     stepOf: (cur, total) => `${cur} of ${total}`,
   },
   es: {
@@ -179,6 +182,9 @@ export const T = {
     popularityBlockbuster: "Taquillera / Popular",
     popularityHidden: "Joya escondida / Indie",
     popularityAny: "No importa",
+    searchLabel: "Buscar",
+    searchPlaceholder: "Buscar películas y series...",
+    searchNoResults: "Sin resultados.",
     stepOf: (cur, total) => `${cur} de ${total}`,
   },
 };

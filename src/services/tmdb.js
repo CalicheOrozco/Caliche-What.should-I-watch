@@ -52,6 +52,14 @@ export async function getTVWatchProviders(id) {
 // Keep old name as alias for backwards compat in WatchProviders component
 export { getMovieWatchProviders as getWatchProviders };
 
+export async function searchMulti(query, lang = "en") {
+  return get("/search/multi", {
+    query,
+    language: lang === "es" ? "es-MX" : "en-US",
+    include_adult: false,
+  });
+}
+
 // Returns all streaming providers available in a given country
 export async function getAvailableProviders(mediaType, country) {
   return get(`/watch/providers/${mediaType}`, {

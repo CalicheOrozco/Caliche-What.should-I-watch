@@ -44,7 +44,7 @@ export default function PlatformSelector({
         });
         const top = [...priorityMap.values()]
           .sort((a, b) => a.display_priority - b.display_priority)
-          .slice(0, 15);
+          .slice(0, 40);
         setPlatforms(top);
       })
       .catch(() => {
@@ -148,7 +148,7 @@ export default function PlatformSelector({
                 )}
 
                 {/* Platform grid */}
-                <div className="px-5 py-4">
+                <div className="px-5 py-4 overflow-y-auto max-h-72">
                   {loading ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="w-7 h-7 border-2 border-zinc-700 border-t-violet-500 rounded-full animate-spin" />

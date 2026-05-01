@@ -20,16 +20,30 @@ function LoadingScreen({ t }) {
   );
 }
 
-function ErrorScreen({ t, onRetry }) {
+function ErrorScreen({ t, error, onRetry, onChangePrefs }) {
+  const isNoResults = error === "NO_RESULTS";
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4 text-center">
-      <p className="text-zinc-400 text-lg">{t("errorMsg")}</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-3 rounded-xl bg-violet-700 hover:bg-violet-600 text-white font-semibold transition-all cursor-pointer"
-      >
-        {t("retry")}
-      </button>
+      <div className="text-4xl">{isNoResults ? "🔍" : "📡"}</div>
+      <p className="text-zinc-300 text-base font-medium max-w-xs">
+        {isNoResults ? t("errorNoResults") : t("errorMsg")}
+      </p>
+      <div className="flex flex-col gap-2 w-full max-w-xs">
+        {!isNoResults && (
+          <button
+            onClick={onRetry}
+            className="w-full px-6 py-3 rounded-xl bg-violet-700 hover:bg-violet-600 text-white font-semibold transition-all cursor-pointer"
+          >
+            {t("retry")}
+          </button>
+        )}
+        <button
+          onClick={onChangePrefs}
+          className="w-full px-6 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold transition-all cursor-pointer"
+        >
+          {t("changePrefs")}
+        </button>
+      </div>
     </div>
   );
 }
@@ -39,10 +53,10 @@ export default function App() {
   const [view, setView] = useState("questionnaire");
   const [answers, setAnswers] = useState({});
 
-  const { history, historyIds, addToHistory, clearHistory } = useHistory();
+  const { history, historyIds, addToHistory, removeFromHistory, clearHistory } = useHistory();
   const { country, setCountry } = useCountry();
   const { selectedIds, togglePlatform, clearPlatforms, selectAllPlatforms } = usePlatforms();
-  const { status, movie, trailer, providers, fetchMovie, fetchById } = useMovieFetcher();
+  const { status, movie, trailer, providers, error, warning, fetchMovie, fetchById } = useMovieFetcher();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const t = useCallback((key) => {
@@ -65,15 +79,11 @@ export default function App() {
 
   function handleLike() {
     if (movie) addToHistory(movie, true);
-    setView("questionnaire");
+    setView("loading");
+    doFetch(answers).then(() => setView("result")).catch(() => setView("error"));
   }
 
-  function handleReject() {
-    if (movie) addToHistory(movie, false);
-    setView("questionnaire");
-  }
-
-  function handleGetAnother() {
+function handleGetAnother() {
     setView("loading");
     doFetch(answers).then(() => setView("result")).catch(() => setView("error"));
   }
@@ -85,6 +95,13 @@ export default function App() {
 
   function handleSearchSelect(id, mediaType) {
     setIsSearchOpen(false);
+    setView("loading");
+    fetchById(id, mediaType, lang)
+      .then(() => setView("result"))
+      .catch(() => setView("error"));
+  }
+
+  function handleHistorySelect(id, mediaType) {
     setView("loading");
     fetchById(id, mediaType, lang)
       .then(() => setView("result"))
@@ -138,7 +155,7 @@ export default function App() {
         {isLoading ? (
           <LoadingScreen t={t} />
         ) : isError ? (
-          <ErrorScreen t={t} onRetry={handleRetry} />
+          <ErrorScreen t={t} error={error} onRetry={handleRetry} onChangePrefs={() => setView("questionnaire")} />
         ) : view === "questionnaire" ? (
           <>
             <div className="pt-12 pb-4 text-center px-4">
@@ -147,6 +164,15 @@ export default function App() {
             <Questionnaire onComplete={handleAnswersComplete} t={t} />
           </>
         ) : view === "result" && movie ? (
+          <>
+            {warning && (
+              <div className="max-w-5xl mx-auto px-4 pt-4">
+                <div className="flex items-center gap-2 bg-amber-950/40 border border-amber-800/50 text-amber-400 text-xs rounded-xl px-4 py-2.5">
+                  <span>⚠️</span>
+                  <span>{warning === "PLATFORMS_IGNORED" ? t("warningPlatformsIgnored") : t("warningLanguageIgnored")}</span>
+                </div>
+              </div>
+            )}
           <MovieResult
             movie={movie}
             trailer={trailer}
@@ -154,15 +180,16 @@ export default function App() {
             country={country}
             onCountryChange={setCountry}
             onLike={handleLike}
-            onReject={handleReject}
             onGetAnother={handleGetAnother}
+            onChangePrefs={() => setView("questionnaire")}
             t={t}
           />
+          </>
         ) : null}
       </main>
 
       {/* History panel */}
-      <History history={history} clearHistory={clearHistory} t={t} />
+      <History history={history} clearHistory={clearHistory} onSelect={handleHistorySelect} onRemove={removeFromHistory} t={t} />
 
       {/* Search modal */}
       <SearchModal

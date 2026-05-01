@@ -1,7 +1,7 @@
 import { useState } from "react";
 import HistoryItem from "./HistoryItem";
 
-export default function History({ history, clearHistory, t }) {
+export default function History({ history, clearHistory, onSelect, onRemove, t }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -42,11 +42,11 @@ export default function History({ history, clearHistory, t }) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-2">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-2">
           {history.length === 0 ? (
             <p className="text-zinc-500 text-sm py-6 text-center">{t("historyEmpty")}</p>
           ) : (
-            history.map((item) => <HistoryItem key={item.id} item={item} t={t} />)
+            history.map((item) => <HistoryItem key={item.id} item={item} t={t} onSelect={onSelect} onRemove={onRemove} />)
           )}
         </div>
 
@@ -104,11 +104,11 @@ export default function History({ history, clearHistory, t }) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-2">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-2">
           {history.length === 0 ? (
             <p className="text-zinc-500 text-sm py-6 text-center">{t("historyEmpty")}</p>
           ) : (
-            history.map((item) => <HistoryItem key={item.id} item={item} t={t} />)
+            history.map((item) => <HistoryItem key={item.id} item={item} t={t} onSelect={onSelect} onRemove={onRemove} />)
           )}
         </div>
 

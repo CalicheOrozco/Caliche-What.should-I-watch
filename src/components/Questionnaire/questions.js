@@ -72,6 +72,7 @@ export const QUESTIONS = [
     options: [
       { value: "English", labelKey: "langEnglish" },
       { value: "Spanish", labelKey: "langSpanish" },
+      { value: "Korean", labelKey: "langKorean" },
       { value: "Any", labelKey: "langAny" },
     ],
   },

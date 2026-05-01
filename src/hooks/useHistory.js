@@ -22,10 +22,19 @@ export function useHistory() {
         id: movie.id,
         title: movie.title,
         poster: movie.poster_path || null,
+        mediaType: movie.mediaType || "movie",
         liked,
         date: new Date().toISOString(),
       };
       const next = [entry, ...filtered];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function removeFromHistory(id) {
+    setHistory((prev) => {
+      const next = prev.filter((h) => h.id !== id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       return next;
     });
@@ -36,5 +45,5 @@ export function useHistory() {
     setHistory([]);
   }
 
-  return { history, historyIds, addToHistory, clearHistory };
+  return { history, historyIds, addToHistory, removeFromHistory, clearHistory };
 }

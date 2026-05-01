@@ -1,10 +1,6 @@
 export default function QuestionCard({ question, onAnswer, onSkip, t, stepLabel }) {
   return (
     <div className="w-full max-w-lg mx-auto px-4">
-      <div className="text-xs text-zinc-500 mb-3 text-center tracking-widest uppercase">
-        {stepLabel}
-      </div>
-
       <h2 className="text-2xl font-semibold text-zinc-100 text-center mb-8">
         {t(question.labelKey)}
       </h2>

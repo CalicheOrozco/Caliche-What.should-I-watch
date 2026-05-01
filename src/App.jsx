@@ -158,7 +158,7 @@ function handleGetAnother() {
           <ErrorScreen t={t} error={error} onRetry={handleRetry} onChangePrefs={() => setView("questionnaire")} />
         ) : view === "questionnaire" ? (
           <>
-            <div className="pt-12 pb-4 text-center px-4">
+            <div className="pt-8 pb-4 text-center px-4">
               <p className="text-zinc-500 text-sm">{t("appSubtitle")}</p>
             </div>
             <Questionnaire onComplete={handleAnswersComplete} t={t} />

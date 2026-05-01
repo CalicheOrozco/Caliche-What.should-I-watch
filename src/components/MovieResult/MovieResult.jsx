@@ -21,21 +21,37 @@ export default function MovieResult({
 }) {
   const [delta, setDelta] = useState(0);
   const startX = useRef(null);
+  const startY = useRef(null);
+  const isHorizontal = useRef(null);
 
   function handleTouchStart(e) {
     startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
+    isHorizontal.current = null;
   }
 
   function handleTouchMove(e) {
     if (startX.current === null) return;
-    setDelta(e.touches[0].clientX - startX.current);
+    const dx = e.touches[0].clientX - startX.current;
+    const dy = e.touches[0].clientY - startY.current;
+
+    // Decide axis on first meaningful move
+    if (isHorizontal.current === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      isHorizontal.current = Math.abs(dx) > Math.abs(dy);
+    }
+
+    if (isHorizontal.current) setDelta(dx);
   }
 
   function handleTouchEnd() {
-    if (delta > SWIPE_THRESHOLD) onLike();
-    else if (delta < -SWIPE_THRESHOLD) onGetAnother();
+    if (isHorizontal.current) {
+      if (delta > SWIPE_THRESHOLD) onLike();
+      else if (delta < -SWIPE_THRESHOLD) onGetAnother();
+    }
     setDelta(0);
     startX.current = null;
+    startY.current = null;
+    isHorizontal.current = null;
   }
 
   const swipingRight = delta > 30;
